@@ -1,1 +1,1 @@
-# ip-to-binary
+# IPv4 to Binary
