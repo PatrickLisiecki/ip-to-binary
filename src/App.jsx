@@ -14,47 +14,90 @@ function App() {
   }
 
   const convertToBinary = (ipString) => {
-    var firstNum = 0;
-    var secondNum = 0;
-    var thirdNum = 0;
-    var fourthNum = 0;
+    // Store each octet as its own element
+    const bytes = []
 
-    var currentSection = 1
-    var currentNum = ""
+    // Keep track of the current octet
+    let currentNum = ""
 
     for (let i = 0; i < ipString.length; i++) {
       const currentChar = ipString.charAt(i)
 
+      // If we reach the end of an octet
       if (currentChar === ".") {
-        switch (currentSection) {
-          case 1:
-            firstNum = Number(currentNum)
-            currentSection = 2
-            break
-          case 2:
-            secondNum = Number(currentNum)
-            currentSection = 3
-            break
-          case 3:
-            thirdNum = Number(currentNum)
-            currentSection = 4
-            break
-          case 4:
-            fourthNum = Number(currentNum)
-            break
-          default:
-            console.log("Error occurred!")
-            break
-        }
-
+        bytes.push(Number(currentNum))
         currentNum = ""
       } else {
         currentNum += currentChar
       }
     }
 
-    console.log(firstNum + " " + secondNum + " " + thirdNum + " " + fourthNum)
-    // setBinary(ipNum)
+    // Push the last octet into the array
+    bytes.push(Number(currentNum))
+
+    console.log(bytes)
+
+    // Store the final binary strings
+    const finalBinary = []
+
+    // Convert each octet to binary
+    for (let i = 0; i < bytes.length; i++) {
+      let binaryString = ""
+      let quotient = bytes[i]
+      let valid = true
+
+      // While the quotient > 0
+      while (valid) {
+        let remainder = quotient % 2;
+
+        // console.log("Remainder: ", remainder)
+
+        // Append the correct bit (0 or 1)
+        switch (remainder) {
+          case 0:
+            binaryString += "0"
+            break
+          case 1:
+            binaryString += "1"
+            break
+          default:
+            console.log("Error")
+            break
+        }
+
+        // console.log("Quotient: ", quotient)
+
+        // quotient = 192
+        // quotient = 192 / 2
+        // quotient = 96
+        quotient = Math.floor(quotient / 2)
+
+        // Check if we can't divide any further
+        if (quotient == 0) {
+          valid = false
+        }
+      }
+
+      // Add zeros to ensure the binary string is byte size
+      if (binaryString.length != 8) {
+        while (binaryString.length < 8) {
+          binaryString += "0"
+        }
+      }
+
+      // Reverse the byte
+      let reversedString = binaryString.split("").reverse().join("")
+
+      // Push the byte to final binary
+      finalBinary.push(reversedString)
+    }
+
+    console.log(finalBinary)
+
+    // Convert final binaries to a string
+    let finalBinaryString = finalBinary.join(".")
+
+    setBinary(finalBinaryString)
   }
 
   return (
@@ -78,8 +121,12 @@ function App() {
           </div>
         </form>
         <div className="w-full p-4 flex flex-col justify-center items-center gap-y-4">
-          <h2 className="text-white text-xl uppercase font-semibold">Binary</h2>
-          {binary.length > 0 && <span className="text-white text-lg font-semibold">{binary}</span>}
+          {binary.length > 0 &&
+            <div className="w-full flex flex-col justify-center items-center gap-y-2">
+              <h2 className="text-white text-xl uppercase font-semibold">Binary</h2>
+              <span className="text-white text-lg font-semibold tracking-[6px]">{binary}</span>
+            </div>
+          }
         </div>
       </div>
     </main >
